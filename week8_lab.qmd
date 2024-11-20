@@ -1,0 +1,74 @@
+---
+title: "Week 8 Lab"
+author: "Rachel Swick"
+format: html
+editor: visual
+---
+
+```{r}
+# Load packages
+library(terra)
+library(sf)
+library(tidyverse)
+library(here)
+library(tmap)
+```
+
+```{r}
+# Create function for NDVI
+ndvi_fun <- function(nir, red){
+  (nir - red)/(nir + red)
+}
+```
+
+### Compute NDVI for a single scene
+
+```{r}
+landsat_20180612 <- terra::rast(here("data", "landsat_20180612.tif"))
+
+names(landsat_20180612) <- c("blue", "green", "red", "NIR", "SWIR1", "SWIR2")
+
+ndvi_20180612 <- lapp(landsat_20180612[[c(4, 3)]], fun = ndvi_fun)
+
+tm_shape(ndvi_20180612) +
+  tm_raster(title = "NDVI") +
+  tm_layout(legend.outside = TRUE)
+```
+
+### COmpute NDVI for all scenes
+
+```{r}
+rm(list =ls())
+
+ndvi_fun <- function(nir, red){
+  (nir - red)/(nir + red)
+}
+```
+
+```{r}
+create_ndvi_layer <- function(){
+  # step 1: read in scene
+  landsat <- terra::rast(file_name)
+  # step 2: rename bands in scene
+  names(landsat) <-  c("blue", "green", "red", "NIR", "SWIR1", "SWIR2")
+  # step 3: compute NDVI
+  ndvi <- lapp(landsat[[c(4, 3)]], fun = ndvi_fun)
+  return(ndvi)
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

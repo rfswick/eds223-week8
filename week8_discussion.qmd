@@ -1,0 +1,90 @@
+---
+title: "Week 8 Section"
+author: "Rachel Swick"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Practice Function Making with Rasters
+
+```{r}
+# Load libraries
+library(tidyverse)
+library(sf)
+library(terra)
+library(dismo)
+library(tmap)
+```
+
+```{r}
+# Load data
+magpie <- read_csv(here::here("data", "data", "magpie_obvs.csv"))
+tule_elk <- read_csv(here::here("data", "data", "tule_elk_obvs.csv"))
+
+bioclim_dir <- here::here("data", "data", "climate", "wc2.1_2.5m")
+bioclim <- list.files(bioclim_dir, pattern = glob2rx("*.tif$"), full.names = TRUE)
+bioclim_rast <- rast(bioclim)
+```
+
+```{r}
+# Update bioclimatic data layer names
+names(bioclim_rast) <- c('BIO1',
+                         'BIO2',
+                         'BIO3',
+                         'BIO4',
+                         'BIO5',
+                         'BIO6',
+                         'BIO7',
+                         'BIO8',
+                         'BIO9',
+                         'BIO10',
+                         'BIO11',
+                         'BIO12',
+                         'BIO13',
+                         'BIO14',
+                         'BIO15',
+                         'BIO16',
+                         'BIO17',
+                         'BIO18',
+                         'BIO19')
+```
+
+```{r}
+# Convert and find the geographic extent of species occurrence data
+magpie_sf <- magpie %>% 
+  filter(species_guess == "Yellow-billed Magpie") %>% 
+  rename(lat = latitude,
+         long = longitude) %>% 
+  drop_na(lat, long) %>% 
+  st_as_sf(coords = c("long", "lat"), crs = 4326)
+```
+
+```{r}
+bioclim_rast <- crop(bioclim_rast, extent(magpie_sf))
+```
+
+```{r}
+bioclim_magpie <- extract(bioclim_rast, magpie_sf)
+```
+
+```{r}
+dismo::randomPoints(bioclim_rast)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
